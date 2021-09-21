@@ -1,3 +1,5 @@
+clear all
+clc
 % Classification using perceptron
 
 % Reading apple images
@@ -78,54 +80,52 @@ w1 = randn(1);
 w2 = randn(1);
 b = randn(1);
 
-% calculate weighted sum with randomly generated parameters
-%v1 = <...>; % write your code here
-% calculate current output of the perceptron 
-if v1 > 0
-	y = 1;
-else
-	y = -1;
+% calculate weighted sum with randomly generated parameters for all 5
+% inputs
+v=[]; y=[]; e=[]; %tuščios matricos rezultatams
+for i=1:5
+    v(i) = x1(i)*w1+x2(i)*w2+b;
+    % calculate current output of the perceptron 
+    if v(i) > 0
+        y(i) = 1;
+    else
+        y(i) = -1;
+    end
+    % calculate the error
+    e =[e T(i)-y(i)];
+    %if e(i)~=0, disp('klaida');end
 end
-% calculate the error
-e1 = T(1) - y;
-
-% repeat the same for the rest 4 inputs x1 and x2
-% calculate wieghted sum with randomly generated parameters
-% v2 = <...> ; % write your code here
-% calculate current output of the perceptron 
-if v2 > 0
-	y = 1;
-else
-	y = -1;
-end
-% calculate the error
-e2 = T(2) - y;
-
-% <...> write the code for another 3 inputs
 
 % calculate the total error for these 5 inputs 
-e = abs(e1) + abs(e2) + abs(e3) + abs(e4) + abs(e5);
+Total_e = sum(abs(e(:)));
+%e = abs(e1) + abs(e2) + abs(e3) + abs(e4) + abs(e5);
 
-% write training algorithm
-while e ~= 0 % executes while the total error is not 0
-	% here should be your code of parameter update
-%   calculate output for current example
-% 
-%   calculate error for current example
-% 
-%   update parameters using current inputs ant current error
-% 	w1 = 
-%   w2 = 
-%   b = 
-% 
-%   Test how good are updated parameters (weights) on all examples used for training
-%   calculate outputs and errors for all 5 examples using current values of the parameter set {w1, w2, b}
-%   calculate 'v1', 'v2', 'v3',... 'v5'
-% 
-%   calculate 'y1', ..., 'y5'
-%     
-%   calculate 'e1', ... 'e5'
-    
-	% calculate the total error for these 5 inputs 
-	e = abs(e1) + abs(e2) + abs(e3) + abs(e4) + abs(e5);
+
+%% write training algorithm
+eta=0.1; %mokymo zingsnis
+N = 0; %Iteraciju kiekis
+while Total_e ~= 0 % executes while the total error is not 0
+
+    v=[]; y=[]; e=[]; %tuščios matricos rezultatams
+
+    for i=1:5
+        v(i) = x1(i)*w1+x2(i)*w2+b;
+        % calculate current output of the perceptron 
+        if v(i) > 0
+            y(i) = 1;
+        else
+            y(i) = -1;
+        end
+        % calculate the error
+        e =[e T(i)-y(i)];
+        %Tinklo svoriu atnaujinimas
+        w1 = w1 + eta*e(i)*x1(i);
+        w2 = w2 + eta*e(i)*x2(i);
+        b = b + eta*e(i)*1;
+        %if e(i)~=0, disp('klaida');end
+    end
+    N=N+1;
+Total_e = sum(abs(e(:)));
 end
+disp(['Apmokyta per ',num2str(N),' iteracijas']);
+
