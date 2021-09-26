@@ -33,7 +33,8 @@ metric_A3=apvalumas_roundness(A3); %roundness
 % 4th apple image(A4)
 hsv_value_A4=spalva_color(A4); %color
 metric_A4=apvalumas_roundness(A4); %roundness
-% 5th apple image(A5)hsv_value_A5=spalva_color(A5); %color
+% 5th apple image(A5)
+hsv_value_A5=spalva_color(A5); %color
 metric_A5=apvalumas_roundness(A5); %roundness
 % 6th apple image(A6)
 hsv_value_A6=spalva_color(A6); %color
@@ -71,7 +72,7 @@ x2=[metric_A1 metric_A2 metric_A3 metric_P1 metric_P2];
 P=[x1;x2];
 
 %Desired output vector
-T=[1;1;1;-1;-1]; % <- ÄŒIA ANKSÄŒIAU BUVO KLAIDA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+T=[1;1;1;-1;-1]; % <- Ä?IA ANKSÄ?IAU BUVO KLAIDA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %% train single perceptron with two inputs and one output
 
@@ -82,8 +83,8 @@ b = randn(1);
 
 % calculate weighted sum with randomly generated parameters for all 5
 % inputs
-v=[]; y=[]; e=[]; %tuÅ¡Äios matricos rezultatams
-for i=1:5
+v=[]; y=[]; e=[]; %tuÅ?Äios matricos rezultatams
+for i=1:length(T)
     v(i) = x1(i)*w1+x2(i)*w2+b;
     % calculate current output of the perceptron 
     if v(i) > 0
@@ -104,12 +105,40 @@ Total_e = sum(abs(e(:)));
 %% write training algorithm
 eta=0.1; %mokymo zingsnis
 N = 0; %Iteraciju kiekis
-while Total_e ~= 0 % executes while the total error is not 0
+Total_e_new = Total_e;
+    while Total_e ~= 0 % executes while the total error is not 0
 
-    v=[]; y=[]; e=[]; %tuÅ¡Äios matricos rezultatams
+        v=[]; y=[]; e=[]; %tuÅ?Äios matricos rezultatams
 
-    for i=1:5
-        v(i) = x1(i)*w1+x2(i)*w2+b;
+        for i=1:length(T)
+            v(i) = x1(i)*w1+x2(i)*w2+b;
+            % calculate current output of the perceptron 
+            if v(i) > 0
+                y(i) = 1;
+            else
+                y(i) = -1;
+            end
+            % calculate the error
+            e =[e T(i)-y(i)];
+            %Tinklo svoriu atnaujinimas
+            w1 = w1 + eta*e(i)*x1(i);
+            w2 = w2 + eta*e(i)*x2(i);
+            b = b + eta*e(i)*1;
+            %if e(i)~=0, disp('klaida');end
+        end
+        N=N+1;
+    Total_e = sum(abs(e(:)));
+    end
+    disp(['Apmokyta per ',num2str(N),' iteracijas']);
+
+    %%Testavimas
+    T_new=[1;1;1;-1;-1];
+    x1_new=[hsv_value_A4 hsv_value_A5 hsv_value_A6 hsv_value_P3 hsv_value_P4];
+    x2_new=[metric_A4 metric_A5 metric_A6 metric_P3 metric_P4];
+    v=[]; y=[]; e=[];
+    
+    for i=1:length(T_new);
+        v(i) = x1_new(i)*w1+x2_new(i)*w2+b;
         % calculate current output of the perceptron 
         if v(i) > 0
             y(i) = 1;
@@ -118,14 +147,12 @@ while Total_e ~= 0 % executes while the total error is not 0
         end
         % calculate the error
         e =[e T(i)-y(i)];
-        %Tinklo svoriu atnaujinimas
-        w1 = w1 + eta*e(i)*x1(i);
-        w2 = w2 + eta*e(i)*x2(i);
-        b = b + eta*e(i)*1;
         %if e(i)~=0, disp('klaida');end
     end
-    N=N+1;
-Total_e = sum(abs(e(:)));
-end
-disp(['Apmokyta per ',num2str(N),' iteracijas']);
 
+    Total_e_new = sum(abs(e(:)));
+
+    if Total_e_new == 0
+        disp('Tikrinime klaidø nerasta');
+    else disp('Tikrinime rasta klaida');
+    end
